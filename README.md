@@ -31,6 +31,8 @@ The backend is responsible for validation, ticket ID generation, persistence, fi
 - CORS support for the frontend
 - Zod request validation
 - Health-check endpoint
+- JWT login and registration
+- Hashed passwords with role-based authorization
 
 ## Technology Stack
 
@@ -95,7 +97,8 @@ Create a file named `.env` in the backend directory:
 ```env
 PORT=5000
 MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/?appName=Cluster0
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=https://support-crm-frontend-alpha.vercel.app
+JWT_SECRET=replace-with-a-long-random-secret
 ```
 
 Replace the username, password, and cluster hostname with the values from MongoDB Atlas. Do not commit the real `.env` file or expose the database password in source control.
@@ -138,6 +141,54 @@ Response:
 ```
 
 ## API Reference
+
+### Register
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "name": "Support Agent",
+  "email": "agent@example.com",
+  "password": "secure-password"
+}
+```
+
+New public registrations receive the `agent` role by default and a seven-day JWT.
+
+### Login
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+
+Request body:
+
+```json
+{
+  "email": "agent@example.com",
+  "password": "secure-password"
+}
+```
+
+Send the returned token with protected requests:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### Authorization Rules
+
+- `GET /api/tickets` and `GET /api/tickets/:ticketId` require a valid login.
+- `POST /api/tickets` requires a valid login.
+- `PUT /api/tickets/:ticketId` requires an `agent` or `admin` role.
+- Passwords are stored as bcrypt hashes and are never returned by the API.
 
 ### Create a Ticket
 

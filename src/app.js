@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import ticketRoutes from './routes/ticket.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { notFoundHandler } from './middleware/notFound.middleware.js';
 
@@ -23,6 +24,7 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Support CRM API is running' });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 
 app.use(notFoundHandler);
