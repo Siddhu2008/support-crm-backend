@@ -23,7 +23,10 @@ const allowedOrigins = new Set([
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(origin)) {
+      const isVercelOrigin = origin?.startsWith('https://') && origin.endsWith('.vercel.app');
+      const isLocalOrigin = origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173';
+
+      if (!origin || allowedOrigins.has(origin) || isVercelOrigin || isLocalOrigin) {
         return callback(null, true);
       }
 
