@@ -10,15 +10,20 @@ import { notFoundHandler } from './middleware/notFound.middleware.js';
 dotenv.config();
 
 const app = express();
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowedOrigins = new Set([
+  ...configuredOrigins,
+  'https://support-crm-frontend-alpha.vercel.app',
+  'http://localhost:5173',
+]);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.has(origin)) {
         return callback(null, true);
       }
 
